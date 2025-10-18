@@ -97,7 +97,7 @@ class DistributedActorCriticNonLinear(DistributedActorCritic):
             next_state, next_actions
         )
         # TODO: Won't actually be able to compute next_state, will need to figure that out
-
+        rewards = rewards
         # dq = self.grad_q(phi)
         alpha = self.alpha
         beta = self.beta
@@ -123,12 +123,12 @@ class DistributedActorCriticNonLinear(DistributedActorCritic):
                     + self.q(next_state_action_vec, i)
                     - self.q(state_action_vec, i)
                 )
-                delta = np.clip(delta, -1.0, 1.0)
+                # delta = np.clip(delta, -1.0, 1.0)
             with torch.no_grad():
                 adv = self.advantage(
                     state_action_vec, state_vec, state, actions, i
                 )  # [n_varphi,]
-                adv = np.clip(adv, -1.0, 1.0)
+                # adv = np.clip(adv, -1.0, 1.0)
             predictor = self.predictors[i]
             predictor._critic_optimizer.zero_grad()
             predictor._actor_optimizer.zero_grad()
@@ -144,8 +144,8 @@ class DistributedActorCriticNonLinear(DistributedActorCritic):
             prob = self._policy(state_vec, i)
             log_prob = torch.log(prob[actions[i]])
             log_prob.backward()
-            torch.nn.utils.clip_grad_norm_(predictor.actor.parameters(), 1.0)
-            torch.nn.utils.clip_grad_norm_(predictor.critic.parameters(), 1.0)
+            torch.nn.utils.clip_grad_norm_(predictor.actor.parameters(), 0.10)
+            torch.nn.utils.clip_grad_norm_(predictor.critic.parameters(), 0.10)
             for param in predictor.actor.parameters():
                 param.data += param.grad * beta * adv
             # grad_theta = beta * adv * ksi
@@ -167,6 +167,7 @@ class DistributedActorCriticNonLinear(DistributedActorCritic):
         #         param.data += alpha * deltas[i] * param.grad
         #     w_tilde_params.append([param.data.clone() for param in critic.parameters()])
         # new_params = []
+        C = np.eye((self.n_agents))
         for i in range(self.n_agents):
             # actor = self.predictors[i].actor
             critic = self.predictors[i].critic

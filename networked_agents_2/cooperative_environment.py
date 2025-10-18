@@ -43,7 +43,10 @@ class CooperativeNavigationEnvironment(Environment):
         self.n_action_space = self.n_actions**n_nodes
         self.seed = seed
         self._env = simple_spread_v3.env(
-            render_mode="human", N=n_nodes, max_cycles=max_cycles
+            render_mode="rgb_array",
+            N=n_nodes,
+            max_cycles=max_cycles,
+            dynamic_rescaling=False,
         )
         self._env.reset(seed=seed)
         self.log = defaultdict(list)
@@ -109,7 +112,7 @@ class CooperativeNavigationEnvironment(Environment):
         agent = self.agents[i]
         # Distance to target landmark
         target = self.landmark_positions[self.targets[i]]
-        dist2 = np.sum(np.square(agent.state.p_pos - target))
+        dist2 = np.sqrt(np.sum(np.square(agent.state.p_pos - target)))
         # agent.collide just says whether the agent is allowed to collide.
         collision = any(
             self._scenario.is_collision(agent, other)

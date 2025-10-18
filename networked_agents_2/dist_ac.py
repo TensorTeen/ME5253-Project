@@ -64,6 +64,7 @@ class DistributedActorCritic(object):
 
     @lru_cache(maxsize=1)
     def _alpha(self, n_steps):
+        # return 0.01
         return np.power((n_steps + 1), -0.65)
 
     @property
@@ -72,6 +73,7 @@ class DistributedActorCritic(object):
 
     @lru_cache(maxsize=1)
     def _beta(self, n_steps):
+        # return 0.01
         return np.power((n_steps + 1), -0.85)
 
     def reset(self):

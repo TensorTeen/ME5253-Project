@@ -12,6 +12,7 @@ Dann, et al. 2014
 from collections import defaultdict
 from functools import cached_property, lru_cache
 from operator import itemgetter
+import logging
 
 import numpy as np
 from numpy.random import uniform
@@ -20,6 +21,8 @@ from tqdm import tqdm
 
 # from consensus import laplacian_weights_matrix
 from .consensus import adjacency_matrix, metropolis_weights_matrix
+
+logger = logging.getLogger(__name__)
 
 np.random.seed(0)
 
@@ -169,6 +172,7 @@ class Environment(object):
     def get_consensus(self):
         adj = self.adjacency
         lwe = metropolis_weights_matrix(adj)
+        logger.debug(f"Consensus Matrix:\n{lwe}")
         return lwe
 
     def loop(self, n_steps, known_rewards: bool = False):

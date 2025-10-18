@@ -8,6 +8,7 @@ import logging
 import logging.config
 from yaml import safe_load
 from pathlib import Path
+from argparse import ArgumentParser
 
 
 import numpy as np
@@ -106,6 +107,22 @@ def main(n_runs, n_processors, n_steps, n_episodes):
 
     return results, str(results_path)
 
+def cli():
+    parser = ArgumentParser()
+    parser.add_argument("-r", "--runs", type=int, default=1)
+    parser.add_argument("-p", "--processors", type=int, default=1)
+    parser.add_argument("-s", "--steps", type=int, default=120)
+    parser.add_argument("-e", "--episodes", type=int, default=10)
+    args = parser.parse_args()
+
+    Path("./data/results").mkdir(exist_ok=True, parents=True)
+    results, results_path = main(
+        n_runs=args.runs,
+        n_processors=args.processors,
+        n_steps=args.steps,
+        n_episodes=args.episodes,
+    )
+
 
 if __name__ == "__main__":
-    results, results_path = main(1, 1, 300, 1)
+    cli()
